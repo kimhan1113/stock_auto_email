@@ -2,8 +2,8 @@ import pandas as pd
 from pandas.plotting import table
 import requests
 import matplotlib.pyplot as plt
-from pandas.plotting import table
 import datetime
+from datetime import date
 from pptx import Presentation  # 라이브러리
 from pptx.util import Inches  # 사진, 표등을 그리기 위해
 import os
@@ -88,7 +88,7 @@ def clean_data(df):
 # 함수 호출
 #################################
 # 종목 코드 가져오기
-company = '삼성전자'
+company = 'LG화학'
 stock_code = get_stock_code()
 
 # 일별 시세 가져오기
@@ -135,7 +135,7 @@ table(ax, df.head(10), loc='center', cellLoc='center',
 #################################
 table_fname = os.path.join(
     "res/stock_report", '{company}_table.png'.format(company=company))
-# plt.savefig(table_fname)
+plt.savefig(table_fname)
 
 #################################
 # 파워포인트 객체 선언
@@ -190,7 +190,11 @@ cursor_sp.addprevious(pic._element)  # 해당 요소를 뒤로 보내기 합니�
 #################################
 # 보고서 저장
 #################################
-ppt_fname = os.path.join("res/stock_report", 'stock_report.pptx')
+
+# company
+
+ppt_filename = 'stock_report_' + company + '_' + str(date.today()) + '.pptx'
+ppt_fname = os.path.join("res/stock_report", ppt_filename)
 prs.save(ppt_fname)
 
 #################################
@@ -251,20 +255,20 @@ def make_multimsg(msg_dict):
 # 함수 호출
 #################################
 smtp_info = dict({"smtp_server": "smtp.naver.com",  # SMTP 서버 주소
-                  "smtp_user_id": "userid",
-                  "smtp_user_pw": "userpasswd",
+                  "smtp_user_id": "senderemail",
+                  "smtp_user_pw": "senderpasswd",
                   "smtp_port": 587})  # SMTP 서버 포트
 
 msg_dict = {
     # 그외 첨부파일
-    'application': {'maintype': 'application', 'subtype': 'octect-stream', 'filename': 'res/email_sending/stock_report.pptx'}
+    'application': {'maintype': 'application', 'subtype': 'octect-stream', 'filename': f'res/email_sending/{ppt_filename}'}
 }
 
 # 메일 내용 작성
 title = '({date}). 주식 보고서 분석 자료 입니다'.format(date=today)
 content = '주식 보고서 분석 자료 입니다'
 sender = "senderemail"
-receiver = "reciveremail"
+receiver = "receiveremail"
 msg = MIMEText(_text=content, _charset="utf-8")
 
 # 첨부파일 추가
